@@ -1,0 +1,20 @@
+name: IstioSM
+services:
+  istio:
+    type: IstioMesh
+    namespace: istio-system
+    settings:
+      version: 1.8.2
+    traits:
+      mTLS:
+        policy: mutual
+        namespaces:
+          - istio-test
+      automaticSidecarInjection:
+        namespaces:
+          - default
+          - istio-test
+      meshmap:
+        position:
+          posX: 98
+          posY: 54.8

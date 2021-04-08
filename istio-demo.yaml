@@ -1,0 +1,43 @@
+name: IstioSM
+version: 1.0.1
+services:
+  istio:
+    type: IstioMesh
+    namespace: istio-system
+    settings:
+      version: 1.8.2
+    traits:
+      mTLS:
+        policy: mutual
+        namespaces:
+          - istio-test
+      automaticSidecarInjection:
+        namespaces:
+          - default
+          - istio-test
+
+  grafana:
+    type: GrafanaIstioAddon
+    namespace: istio-system
+    dependsOn:
+      - istio
+      - prometheus
+
+  prometheus:
+    type: PrometheusIstioAddon
+    namespace: istio-system
+    dependsOn:
+      - istio
+
+  zipkin:
+    type: ZipkinIstioAddon
+    variant: zipkin
+    namespace: istio-system
+    dependsOn:
+      - istio
+
+  jaeger:
+    type: JaegerIstioAddon
+    namespace: istio-system
+    dependsOn:
+      - istio

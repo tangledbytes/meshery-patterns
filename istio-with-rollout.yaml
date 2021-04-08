@@ -1,0 +1,61 @@
+name: RolloutAndIstio
+version: Rollouts-2.3.0
+services:
+  istio:
+    type: IstioMesh
+    namespace: istio-system
+    settings:
+      version: 1.8.2
+    traits:
+      mTLS:
+        policy: mutual
+        namespaces:
+          - istio-test
+      automaticSidecarInjection:
+        namespaces:
+          - default
+          - istio-test
+      meshmap:
+        position:
+          x: 98
+          y: 100
+
+  svc:
+    type: Rollout
+    namespace: istio-test
+    settings:
+      replicas: 5
+      containers:
+        - name: svc-demo
+          image: utkarsh23/meshy:v5
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          resources:
+            requests:
+              memory: 32Mi
+              cpu: 5m
+      svcPorts:
+        - 8080:8080
+    traits:
+      strategy:
+        canary:
+          steps:
+            - setWeight: 20
+            - pause: { duration: 20 }
+            - setWeight: 40
+            - pause: { duration: 10 }
+
+  prometheus:
+    type: PrometheusIstioAddon
+    namespace: istio-system
+    dependsOn:
+      - istio
+      - svc
+  
+  grafana:
+    type: GrafanaIstioAddon
+    namespace: istio-system
+    dependsOn:
+      - prometheus
