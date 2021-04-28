@@ -53,7 +53,7 @@ services:
     dependsOn:
       - istio
       - svc
-  
+
   grafana:
     type: GrafanaIstioAddon
     namespace: istio-system
